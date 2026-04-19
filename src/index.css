@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors - Deep Slate & Neon Accents */
+  --color-slate-900: #0f111a;
+  --color-slate-950: #090a0f;
+  --color-neon-purple: #9d4edd;
+  --color-neon-blue: #00f5ff;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Clash Display', 'Inter', system-ui, sans-serif;
+
+  /* Glassmorphism utilities */
+  --background-image-hero-glow: radial-gradient(circle at 50% 0%, rgba(157, 78, 221, 0.15) 0%, rgba(157, 78, 221, 0) 70%);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-slate-950 text-slate-200 antialiased overflow-x-hidden;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply tracking-tight;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-neon-purple leading-tight;
+  }
+
+  .text-gradient-purple {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-500 leading-tight;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
