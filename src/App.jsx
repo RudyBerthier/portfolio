@@ -52,26 +52,26 @@ function ProjectCard3D({ title, desc, tech, link, imageClass, index }) {
         className="group relative rounded-3xl glass-panel w-full md:h-[500px] flex flex-col md:flex-row shadow-2xl hover:border-violet-500/50 transition-colors cursor-pointer"
       >
         {/* L'image - avec un effet de profondeur Z (translateZ) */}
-        <div 
+        <div
           className="relative w-full md:w-3/5 h-64 md:h-full overflow-hidden rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none"
           style={{ transform: "translateZ(30px)" }}
         >
           <div className={`absolute inset-0 ${imageClass} bg-cover bg-center transition-transform duration-700 group-hover:scale-110`} />
           <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-900/90 via-slate-900/40 to-transparent z-10" />
         </div>
-        
+
         {/* Le Texte - en surélévation Z */}
-        <div 
+        <div
           className="p-8 md:p-12 flex flex-col justify-center w-full md:w-2/5 z-20 bg-slate-900/60 backdrop-blur-md rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none"
           style={{ transform: "translateZ(50px)" }}
         >
-          <motion.div 
-            className="absolute -top-10 -right-10 w-40 h-40 bg-violet-600/30 blur-[50px] rounded-full pointer-events-none group-hover:bg-cyan-500/30 transition-colors" 
+          <motion.div
+            className="absolute -top-10 -right-10 w-40 h-40 bg-violet-600/30 blur-[50px] rounded-full pointer-events-none group-hover:bg-cyan-500/30 transition-colors"
           />
-          
+
           <h3 className="text-3xl font-black text-white mb-4 tracking-tight drop-shadow-xl">{title}</h3>
           <p className="text-slate-300 mb-8 max-w-sm drop-shadow-md leading-relaxed">{desc}</p>
-          
+
           <div className="flex flex-wrap gap-2 mb-8">
             {tech.map((t, i) => (
               <span key={i} className="text-xs font-bold tracking-wider px-3 py-1 bg-white/10 border border-white/20 shadow-xl rounded-full text-white">
@@ -79,14 +79,14 @@ function ProjectCard3D({ title, desc, tech, link, imageClass, index }) {
               </span>
             ))}
           </div>
-          
-          <a 
-            href={link} 
-            target="_blank" 
-            rel="noreferrer" 
+
+          <a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center gap-2 text-violet-400 font-bold hover:text-cyan-400 transition-colors group/link w-max mt-auto"
           >
-            Découvrir le projet 
+            Découvrir le projet
             <motion.div
               initial={{ x: 0 }}
               whileHover={{ x: 5, scale: 1.1 }}
@@ -139,13 +139,13 @@ function HeroSection() {
           ))}
         </div>
 
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, filter: "blur(20px)", y: 20 }}
           animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
           transition={{ duration: 1, delay: 1 }}
           className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-12 font-medium"
         >
-          Développeur Full-Stack passionné par les interfaces premium, 
+          Développeur Full-Stack passionné par les interfaces premium,
           le design interactif hybride et les architectures ultra-rapides.
         </motion.p>
 
@@ -166,7 +166,7 @@ function HeroSection() {
           </a>
         </motion.div>
       </motion.div>
-      
+
       <a href="#projects" className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-slate-400 hover:text-white transition-colors cursor-pointer z-20">
         <ChevronDown className="w-10 h-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
       </a>
@@ -178,7 +178,7 @@ function ProjectsSection() {
   return (
     <section id="projects" className="py-32 px-6 md:px-12 max-w-7xl mx-auto relative z-10">
       <div className="mb-24 flex flex-col items-center text-center">
-        <motion.h2 
+        <motion.h2
           initial={{ opacity: 0, scale: 0.8, rotateX: 45 }}
           whileInView={{ opacity: 1, scale: 1, rotateX: 0 }}
           viewport={{ once: true }}
@@ -192,7 +192,7 @@ function ProjectsSection() {
       </div>
 
       <div className="space-y-24">
-        <ProjectCard3D 
+        <ProjectCard3D
           title="Gestion Locative"
           desc="Une plateforme immersive de gestion immobilière. Conçue avec une interface fluide et un puissant backend garantissant rapidité et fiabilité en production."
           tech={['React', 'Vite', 'Express', 'Supabase', 'PostgreSQL', 'Tailwind', 'Resend']}
@@ -233,9 +233,9 @@ function SkillsSection() {
         className="grid grid-cols-1 md:grid-cols-3 gap-8"
       >
         {skills.map((s, i) => (
-          <motion.div 
-            key={i} 
-            variants={itemVariants} 
+          <motion.div
+            key={i}
+            variants={itemVariants}
             className="group relative glass-panel p-10 rounded-3xl overflow-hidden hover:-translate-y-4 transition-transform duration-500"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -253,15 +253,15 @@ function SkillsSection() {
 
 function ContactSection() {
   return (
-    <section id="contact" className="py-40 relative flex flex-col items-center justify-center text-center px-6 mt-20 z-10 overflow-hidden">
+    <section id="contact" className="py-40 relative flex flex-col items-center justify-center text-center px-6 z-10 overflow-hidden">
       {/* Intense glow specific to footer purely decorative but dramatic */}
-      <motion.div 
+      <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.3, 0.1] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-violet-600/40 via-slate-950/0 to-slate-950/0 z-0 pointer-events-none" 
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-violet-600/40 via-slate-950/0 to-slate-950/0 z-0 pointer-events-none"
       />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, scale: 0.8, rotateX: 30 }}
         whileInView={{ opacity: 1, scale: 1, rotateX: 0 }}
         viewport={{ once: true }}
@@ -275,7 +275,7 @@ function ContactSection() {
         <p className="text-slate-300 mb-12 max-w-xl mx-auto text-xl font-medium drop-shadow-lg">
           Transformons vos idées en expériences immersives hors du commun. Paré pour un nouveau défi.
         </p>
-        
+
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           <a href="mailto:rudyberthier@gmail.com" className="relative group px-10 py-5 bg-white text-slate-950 font-black text-lg rounded-full overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-shadow">
             <span className="absolute inset-0 bg-gradient-to-r from-neon-blue to-neon-purple opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0" />
@@ -326,15 +326,15 @@ function MouseTracker() {
 export default function App() {
   return (
     <div className="bg-slate-950 min-h-screen font-sans selection:bg-violet-500/30 relative overflow-hidden">
-      
+
       <MouseTracker />
 
       {/* Global Background Glow */}
       <div className="fixed inset-0 bg-[image:var(--background-image-hero-glow)] z-0 pointer-events-none" />
-      
+
       {/* Global Animated blurry blobs - Drifting only, NO ROTATE for perf */}
-      <motion.div 
-        animate={{ 
+      <motion.div
+        animate={{
           y: [0, -30, 0],
           x: [0, 20, 0],
           opacity: [0.3, 0.4, 0.3]
@@ -342,8 +342,8 @@ export default function App() {
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         className="fixed top-1/4 left-1/4 w-[500px] h-[500px] bg-violet-600/40 rounded-full blur-[120px] z-0 pointer-events-none"
       />
-      <motion.div 
-        animate={{ 
+      <motion.div
+        animate={{
           y: [0, 40, 0],
           x: [0, -30, 0],
           opacity: [0.2, 0.3, 0.2]
