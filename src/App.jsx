@@ -69,9 +69,7 @@ function ProjectCard3D({ title, desc, tech, link, imageClass, index }) {
           className="p-8 md:p-12 flex flex-col justify-center w-full md:w-2/5 z-20 bg-slate-900/60 backdrop-blur-md rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none"
           style={{ transform: "translateZ(50px)" }}
         >
-          <motion.div
-            className="absolute -top-10 -right-10 w-40 h-40 bg-violet-600/30 blur-[50px] rounded-full pointer-events-none group-hover:bg-cyan-500/30 transition-colors"
-          />
+
 
           <h3 className="text-3xl font-black text-white mb-4 tracking-tight drop-shadow-xl">{title}</h3>
           <p className="text-slate-300 mb-8 max-w-sm drop-shadow-md leading-relaxed">{desc}</p>
