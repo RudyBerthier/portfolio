@@ -882,11 +882,10 @@ function InteractiveTerminal() {
       </button>
 
       {/* Terminal Window */}
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence>
         {isOpen && (
           <motion.div
             layout
-            layoutId="terminal-window"
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={isNuked
               ? { x: [-6, 6, -6, 6, 0], opacity: 1, y: 0, scale: 1 }
