@@ -50,3 +50,11 @@
     scrollbar-width: none;  /* Firefox */
   }
 }
+
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+
