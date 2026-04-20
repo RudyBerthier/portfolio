@@ -837,20 +837,36 @@ function InteractiveTerminal() {
     }
   }
 
+  // SVG icons for each button — pixel-perfect centering regardless of font
+  const btnIcons = {
+    close: (
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+        <line x1="1" y1="1" x2="7" y2="7" stroke="rgba(0,0,0,0.65)" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="7" y1="1" x2="1" y2="7" stroke="rgba(0,0,0,0.65)" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+    minimize: (
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+        <line x1="1" y1="4" x2="7" y2="4" stroke="rgba(0,0,0,0.65)" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+    maximize: (
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+        <path d="M1 5V1h4" stroke="rgba(0,0,0,0.65)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M7 3v4H3" stroke="rgba(0,0,0,0.65)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  }
+
   // macOS-style window control button
-  // Shows icon when the GROUP is hovered (like real macOS behavior)
-  const MacBtn = ({ icon, color, onClick, title }) => (
+  const MacBtn = ({ iconKey, color, onClick, title }) => (
     <button
       onClick={onClick}
       style={{ cursor: 'default' }}
       title={title}
-      className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-all ${color} shadow-sm focus:outline-none`}
+      className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-opacity ${color} shadow-sm focus:outline-none`}
     >
-      {isGroupHovered && (
-        <span className="text-black/70 font-black leading-none select-none" style={{ fontSize: '9px', lineHeight: 1 }}>
-          {icon}
-        </span>
-      )}
+      {isGroupHovered && btnIcons[iconKey]}
     </button>
   )
 
@@ -890,19 +906,19 @@ function InteractiveTerminal() {
                 <MacBtn
                   title="Fermer"
                   color="bg-[#FF5F57]"
-                  icon="×"
+                  iconKey="close"
                   onClick={() => setIsOpen(false)}
                 />
                 <MacBtn
                   title="Réduire"
                   color="bg-[#FFBD2E]"
-                  icon="–"
+                  iconKey="minimize"
                   onClick={() => { setIsMinimized(v => !v); setIsExpanded(false) }}
                 />
                 <MacBtn
                   title="Agrandir"
                   color="bg-[#28C840]"
-                  icon="⤢"
+                  iconKey="maximize"
                   onClick={() => { setIsExpanded(v => !v); setIsMinimized(false) }}
                 />
               </div>
