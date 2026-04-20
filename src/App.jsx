@@ -774,65 +774,162 @@ function InteractiveTerminal() {
   const [isExpanded, setIsExpanded] = useState(false)
   const [input, setInput] = useState('')
   const [history, setHistory] = useState([
-    { type: 'system', text: 'Connexion établie. Tapez "help" pour voir les commandes disponibles.' }
+    { type: 'system', text: 'Bienvenue sur le terminal de Rudy Berthier.\nTapez "help" pour voir les commandes disponibles.' }
   ])
+  const [cmdHistory, setCmdHistory] = useState([]) // command history for ↑↓
+  const [cmdHistoryIdx, setCmdHistoryIdx] = useState(-1)
   const [isNuked, setIsNuked] = useState(false)
   const [isGroupHovered, setIsGroupHovered] = useState(false)
   
   const endOfMessagesRef = useRef(null)
+  const inputRef = useRef(null)
+
+  // All available commands for autocomplete
+  const COMMANDS = [
+    'help', 'whoami', 'about', 'skills', 'projects', 'contact',
+    'github', 'linkedin', 'cv', 'open projects', 'open about',
+    'open contact', 'date', 'ls', 'clear',
+    'sudo rm -rf /', 'rm -rf /', 'sudo rm -rf',
+  ]
+
+  // Compute autocomplete suggestion
+  const suggestion = input.length >= 1
+    ? COMMANDS.find(cmd => cmd.startsWith(input.toLowerCase()) && cmd !== input.toLowerCase()) ?? ''
+    : ''
+  const ghostText = suggestion ? suggestion.slice(input.length) : ''
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [history, isOpen])
 
   const handleCommand = (e) => {
-    if (e.key === 'Enter') {
-      const cmd = input.trim().toLowerCase()
-      let response = ''
-      
-      const newHistory = [...history, { type: 'user', text: `rudy@portfolio:~$ ${input}` }]
-
-      switch(cmd) {
-        case 'help':
-          response = `Commandes disponibles:\n- whoami   : en savoir plus sur moi\n- projects : voir mes réalisations\n- contact  : afficher mes coordonnées\n- clear    : nettoyer le terminal`
-          break
-        case 'whoami':
-          response = "Rudy Berthier\nIngénieur Full-Stack. Passionné par le design interactif de haute voltige et les architectures backend performantes."
-          break
-        case 'projects':
-          response = "Projet principal : Gestion-Locative (https://gestion.rberthier.fr)\nTapez 'open projects' pour naviguer directement à ma section."
-          break
-        case 'open projects':
-          response = "Ouverture des projets..."
-          document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })
-          break
-        case 'contact':
-          response = "Email : rudyberthier@gmail.com\nGithub: github.com/RudyBerthier"
-          break
-        case 'clear':
-          setHistory([])
-          setInput('')
-          return
-        case 'sudo rm -rf /':
-        case 'rm -rf /':
-        case 'sudo rm -rf':
-          setIsNuked(true)
-          response = "⚠️ ERREUR CRITIQUE. NUKING PORTFOLIO FILESYSTEM...\n\nJUST KIDDING 😎 Pas mal essayé !"
-          setTimeout(() => setIsNuked(false), 4000)
-          break
-        case '':
-          break;
-        default:
-          response = `bash: ${cmd}: command not found`
-      }
-
-      if (response) {
-        newHistory.push({ type: 'output', text: response })
-      }
-
-      setHistory(newHistory)
-      setInput('')
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      if (suggestion) setInput(suggestion)
+      return
     }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      const newIdx = Math.min(cmdHistoryIdx + 1, cmdHistory.length - 1)
+      setCmdHistoryIdx(newIdx)
+      if (cmdHistory[newIdx] !== undefined) setInput(cmdHistory[newIdx])
+      return
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      const newIdx = Math.max(cmdHistoryIdx - 1, -1)
+      setCmdHistoryIdx(newIdx)
+      setInput(newIdx === -1 ? '' : cmdHistory[newIdx])
+      return
+    }
+
+    if (e.key !== 'Enter') return
+
+    const cmd = input.trim().toLowerCase()
+    let response = ''
+    const newHistory = [...history, { type: 'user', text: `rudy@portfolio:~$ ${input}` }]
+    
+    if (input.trim()) {
+      setCmdHistory(prev => [input.trim(), ...prev])
+      setCmdHistoryIdx(-1)
+    }
+
+    switch(cmd) {
+      case 'help':
+        response = `┌─ Commandes disponibles ─────────────────────┐
+│ whoami      · Qui suis-je ?                 │
+│ about       · Présentation synthétique      │
+│ skills      · Mes compétences techniques    │
+│ projects    · Mes réalisations              │
+│ contact     · Email & coordonnées           │
+│ github      · Ouvrir mon profil GitHub      │
+│ linkedin    · Ouvrir mon LinkedIn           │
+│ cv          · Télécharger mon CV            │
+│ date        · Afficher la date/heure        │
+│ ls          · Lister les sections du site   │
+│ open about  · Naviguer vers "À propos"      │
+│ open projects · Naviguer vers les projets   │
+│ open contact· Naviguer vers le contact      │
+│ clear       · Nettoyer le terminal         │
+└─────────────────────────────────────────────┘
+💡 Astuce : Tab pour autocompléter, ↑↓ pour l'historique`
+        break
+      case 'whoami':
+        response = `rudy@portfolio
+─────────────────────────────────────────
+Nom     : Rudy Berthier
+Rôle    : Ingénieur Full-Stack
+Stack   : React · Node.js · PostgreSQL
+Lieu    : France 🇫🇷
+Statut  : ✅ Ouvert aux opportunités`
+        break
+      case 'about':
+        response = `Je suis développeur Full-Stack passionné par l'architecture frontend immersive et les backends performants.\nJ'aime construire des expériences web qui "waouh" — de l'animation Framer au reverse proxy Oracle.`
+        break
+      case 'skills':
+        response = `⚡ Frontend  → React 18, TypeScript, Tailwind V4, Framer Motion
+🛢  Backend   → Node.js, Express, PostgreSQL, Supabase
+☁️  DevOps    → Oracle Cloud, PM2, Nginx, GitHub Actions
+🎨 Design    → Figma, Glassmorphism, 3D CSS`
+        break
+      case 'projects':
+        response = `📦 Projets en ligne :\n  → Gestion Locative  https://gestion.rberthier.fr\n  → Portfolio         https://rberthier.fr\n\nTapez "open projects" pour y naviguer directement.`
+        break
+      case 'contact':
+        response = `📬 Me contacter :\n  Email    · rudyberthier@gmail.com\n  GitHub   · github.com/RudyBerthier\n  LinkedIn · linkedin.com/in/rudyberthier`
+        break
+      case 'github':
+        response = `↗ Ouverture de github.com/RudyBerthier...`
+        window.open('https://github.com/RudyBerthier', '_blank')
+        break
+      case 'linkedin':
+        response = `↗ Ouverture de LinkedIn...`
+        window.open('https://linkedin.com/in/rudyberthier', '_blank')
+        break
+      case 'cv':
+        response = `↗ Téléchargement du CV...`
+        window.open('/cv.pdf', '_blank')
+        break
+      case 'date':
+        response = `📅 ${new Date().toLocaleString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' })}`
+        break
+      case 'ls':
+        response = `drwxr-xr-x  hero/\ndrwxr-xr-x  about/\ndrwxr-xr-x  projects/\ndrwxr-xr-x  skills/\ndrwxr-xr-x  contact/`
+        break
+      case 'open about':
+        response = `↗ Navigation vers "À propos"...`
+        document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'open projects':
+        response = `↗ Navigation vers "Projets"...`
+        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'open contact':
+        response = `↗ Navigation vers "Contact"...`
+        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'clear':
+        setHistory([])
+        setInput('')
+        return
+      case 'sudo rm -rf /':
+      case 'rm -rf /':
+      case 'sudo rm -rf':
+        setIsNuked(true)
+        response = `⚠️  KERNEL PANIC — NUKING FILESYSTEM...\n██████████████████░░ 90%\n\nJUST KIDDING 😎 Bien essayé !`
+        setTimeout(() => setIsNuked(false), 4000)
+        break
+      case '':
+        break
+      default:
+        response = `bash: ${cmd}: command not found\nTapez "help" pour voir les commandes disponibles.`
+    }
+
+    if (response) newHistory.push({ type: 'output', text: response })
+    setHistory(newHistory)
+    setInput('')
   }
 
   // SVG icons for each button — pixel-perfect centering regardless of font
@@ -949,17 +1046,27 @@ function InteractiveTerminal() {
                       ))}
                     </div>
 
-                    <div className="flex items-center">
-                      <span className={`mr-2 ${isNuked ? 'text-red-500 font-bold' : 'text-violet-400'}`}>rudy@portfolio:~$</span>
-                      <input
-                        type="text"
-                        autoFocus
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleCommand}
-                        className={`flex-1 bg-transparent border-none outline-none ${isNuked ? 'text-red-500 font-bold' : 'text-white'}`}
-                        spellCheck={false}
-                      />
+                    <div className="flex items-center relative">
+                      <span className={`mr-2 shrink-0 ${isNuked ? 'text-red-500 font-bold' : 'text-violet-400'}`}>rudy@portfolio:~$</span>
+                      {/* Ghost text layer — shown behind the real input */}
+                      <div className="relative flex-1">
+                        <span className="absolute inset-0 pointer-events-none whitespace-pre font-mono text-sm" aria-hidden="true">
+                          <span className="text-transparent">{input}</span>
+                          <span className="text-slate-600">{ghostText}</span>
+                        </span>
+                        <input
+                          ref={inputRef}
+                          type="text"
+                          autoFocus
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          onKeyDown={handleCommand}
+                          className={`relative w-full bg-transparent border-none outline-none ${isNuked ? 'text-red-500 font-bold' : 'text-white'}`}
+                          spellCheck={false}
+                          autoCapitalize="none"
+                          autoCorrect="off"
+                        />
+                      </div>
                     </div>
                     <div ref={endOfMessagesRef} />
                   </div>
