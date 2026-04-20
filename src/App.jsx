@@ -772,11 +772,14 @@ function CommandPalette() {
 // --- INTERACTIVE TERMINAL ---
 function InteractiveTerminal() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [input, setInput] = useState('')
   const [history, setHistory] = useState([
     { type: 'system', text: 'Connexion établie. Tapez "help" pour voir les commandes disponibles.' }
   ])
   const [isNuked, setIsNuked] = useState(false)
+  const [isGroupHovered, setIsGroupHovered] = useState(false)
   
   const endOfMessagesRef = useRef(null)
 
@@ -834,68 +837,122 @@ function InteractiveTerminal() {
     }
   }
 
+  // macOS-style window control button
+  // Shows icon when the GROUP is hovered (like real macOS behavior)
+  const MacBtn = ({ icon, color, onClick, title }) => (
+    <button
+      onClick={onClick}
+      style={{ cursor: 'default' }}
+      title={title}
+      className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-all ${color} shadow-sm focus:outline-none`}
+    >
+      {isGroupHovered && (
+        <span className="text-black/70 font-black leading-none select-none" style={{ fontSize: '9px', lineHeight: 1 }}>
+          {icon}
+        </span>
+      )}
+    </button>
+  )
+
   return (
     <>
       {/* Floating launcher */}
       <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-40 p-4 bg-slate-900 border border-slate-700 hover:border-violet-500 rounded-full shadow-2xl hover:bg-slate-800 transition-all text-violet-400 group cursor-pointer"
+        onClick={() => { setIsOpen(!isOpen); setIsMinimized(false) }}
+        className="fixed bottom-6 right-6 z-40 p-4 bg-slate-900 border border-slate-700 hover:border-violet-500 rounded-full shadow-2xl hover:bg-slate-800 transition-all text-violet-400 group"
+        style={{ cursor: 'default' }}
       >
         <TerminalSquare className="w-6 h-6 group-hover:scale-110 transition-transform" />
       </button>
 
       {/* Terminal Window */}
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={isNuked ? { x: [-10, 10, -10, 10, 0], opacity: 1, y: 0, scale: 1, transition: { duration: 0.4 } } : { opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className={`fixed bottom-28 right-6 w-11/12 md:max-w-md bg-slate-950/90 border border-slate-700/50 rounded-lg shadow-2xl overflow-hidden z-50 backdrop-blur-xl font-mono text-sm transition-colors duration-300 ${isNuked ? 'border-red-500 bg-red-950/40' : ''}`}
+            layout
+            layoutId="terminal-window"
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={isNuked
+              ? { x: [-6, 6, -6, 6, 0], opacity: 1, y: 0, scale: 1 }
+              : { opacity: 1, y: 0, scale: 1 }
+            }
+            exit={{ opacity: 0, y: 20, scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            style={{ width: isExpanded ? '700px' : '448px', maxWidth: 'calc(100vw - 3rem)' }}
+            className={`fixed bottom-28 right-6 bg-slate-950/90 border border-slate-700/50 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl font-mono text-sm ${isNuked ? 'border-red-500 bg-red-950/40' : ''}`}
           >
-            {/* Window Header */}
-            <div className="flex items-center px-4 py-2 bg-slate-900 border-b border-slate-800/50 cursor-default">
-              <div className="flex gap-2 mr-4">
-                <div className="w-3 h-3 rounded-full bg-red-500/80 cursor-pointer hover:bg-red-400" onClick={() => setIsOpen(false)} />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                <div className="w-3 h-3 rounded-full bg-green-500/80" />
-              </div>
-              <div className="text-slate-400 text-xs font-semibold flex-1 text-center mr-8 select-none">rudy@portfolio:~</div>
-            </div>
-
-            {/* Terminal Body */}
-            <div 
-              className="p-4 h-64 overflow-y-auto w-full scrollbar-none"
-              onClick={(e) => {
-                e.currentTarget.querySelector('input')?.focus()
-              }}
+            <div
+              className="flex items-center px-4 py-3 bg-slate-900/80 border-b border-slate-800/60 select-none"
+              onMouseEnter={() => setIsGroupHovered(true)}
+              onMouseLeave={() => setIsGroupHovered(false)}
             >
-              <div className="space-y-2 pb-2">
-                {history.map((line, i) => (
-                  <div key={i} className={`whitespace-pre-wrap ${
-                    line.type === 'user' ? 'text-cyan-400' : 
-                    line.type === 'system' ? 'text-slate-500' : 
-                    isNuked ? 'text-red-500 font-bold' : 'text-slate-300'
-                  }`}>
-                    {line.text}
-                  </div>
-                ))}
-              </div>
-              
-              <div className="flex items-center">
-                <span className={`mr-2 ${isNuked ? 'text-red-500 font-bold' : 'text-violet-400'}`}>rudy@portfolio:~$</span>
-                <input
-                  type="text"
-                  autoFocus
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleCommand}
-                  className={`flex-1 bg-transparent border-none outline-none ${isNuked ? 'text-red-500 font-bold' : 'text-white'}`}
-                  spellCheck={false}
+              <div className="flex gap-2 mr-4">
+                <MacBtn
+                  title="Fermer"
+                  color="bg-[#FF5F57]"
+                  icon="×"
+                  onClick={() => setIsOpen(false)}
+                />
+                <MacBtn
+                  title="Réduire"
+                  color="bg-[#FFBD2E]"
+                  icon="–"
+                  onClick={() => { setIsMinimized(v => !v); setIsExpanded(false) }}
+                />
+                <MacBtn
+                  title="Agrandir"
+                  color="bg-[#28C840]"
+                  icon="⤢"
+                  onClick={() => { setIsExpanded(v => !v); setIsMinimized(false) }}
                 />
               </div>
-              <div ref={endOfMessagesRef} />
+              <div className="text-slate-400 text-xs font-semibold flex-1 text-center mr-8">rudy@portfolio:~</div>
             </div>
+
+            {/* Terminal Body — hidden when minimized */}
+            <AnimatePresence initial={false}>
+              {!isMinimized && (
+                <motion.div
+                  key="terminal-body"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div
+                    className="p-4 h-64 overflow-y-auto w-full scrollbar-none"
+                    onClick={(e) => { e.currentTarget.querySelector('input')?.focus() }}
+                  >
+                    <div className="space-y-2 pb-2">
+                      {history.map((line, i) => (
+                        <div key={i} className={`whitespace-pre-wrap ${
+                          line.type === 'user' ? 'text-cyan-400' :
+                          line.type === 'system' ? 'text-slate-500' :
+                          isNuked ? 'text-red-500 font-bold' : 'text-slate-300'
+                        }`}>
+                          {line.text}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center">
+                      <span className={`mr-2 ${isNuked ? 'text-red-500 font-bold' : 'text-violet-400'}`}>rudy@portfolio:~$</span>
+                      <input
+                        type="text"
+                        autoFocus
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleCommand}
+                        className={`flex-1 bg-transparent border-none outline-none ${isNuked ? 'text-red-500 font-bold' : 'text-white'}`}
+                        spellCheck={false}
+                      />
+                    </div>
+                    <div ref={endOfMessagesRef} />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
